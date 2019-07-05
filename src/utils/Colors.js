@@ -4,9 +4,11 @@ export default class Colors {
   static BLACK = 'black';
 
   static PRIMARY = '#66F';
+  static ERROR   = '#F33';
+  static SUCCESS = '#3F3';
 
   static DEFAULT_TEXT     = '#666';
-  static LIGHT_TEXT       = '#CCC';
+  static LIGHT_TEXT       = '#AAA';
   static EXTRA_LIGHT_TEXT = '#EFEFEF';
 
   static random = () => {

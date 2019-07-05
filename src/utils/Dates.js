@@ -73,4 +73,11 @@ export default class Dates {
     const timeString = date.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     return timeString;
   };
+
+  static isBetweenPeriod = (date, startDate, endDate) => {
+    if(!date || !startDate || !endDate)
+      return false;
+
+    return startDate.getTime() <= date.getTime() && endDate.getTime() >= date.getTime();
+  }; 
 };

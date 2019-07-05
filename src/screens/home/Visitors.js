@@ -5,18 +5,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import ScreenContainer   from 'components/ScreenContainer';
 
-import { getVisits } from 'services/VisitsService';
+import { getVisitors } from 'services/VisitorsService';
 
 import Dates  from 'utils/Dates';
 import Colors from 'utils/Colors';
 
-export default class MyVisits extends Component {
+export default class Visitors extends Component {
   constructor(props) {
     super(props);
 
     this.state ={ 
       loading:    true,
-      visits:     [],
+      visitors:   [],
       refreshing: false,
     };
   };
@@ -32,24 +32,24 @@ export default class MyVisits extends Component {
 
   loadData = async (load) => {
     const now = new Date();
-    const loadedData = await getVisits();
+    const loadedData = await getVisitors();
     this.setState({
       loading:    false,
       refreshing: false,
-      visits:     loadedData,
+      visitors:   loadedData,
     });
   };
 
   render() {
-    const { loading, visits, refreshing } = this.state;
-    const { navigation }                  = this.props;
+    const { loading, visitors, refreshing } = this.state;
+    const { navigation }                    = this.props;
 
     return (
-      <ScreenContainer title="Minhas visitas" loading={loading} scrollable={false} style={styles.container}>
+      <ScreenContainer title="Visitantes autorizados" loading={loading} scrollable={false} style={styles.container}>
         <FlatList
-          data={visits.sort((visit1, visit2) => visit2.createDate - visit1.createDate)}
-          keyExtractor={visit => 'visit-' + visit.id}
-          renderItem={this.renderVisit}
+          data={visitors.sort((visitor1, visitor2) => visitor1.name.localeCompare(visitor2.name))}
+          keyExtractor={visitor => 'visitor-' + visitor.id}
+          renderItem={this.renderVisitor}
           onRefresh={this.refresh}
           refreshing={refreshing}
           ListEmptyComponent={this.renderEmpty}
@@ -62,32 +62,24 @@ export default class MyVisits extends Component {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>
-          Nenhuma visita para você
+          Nenhum visitante autorizado
         </Text>
       </View>
     );
   };
 
-  renderVisit = ({item}) => {
-    const creationDate = item.createDate && new Date(item.createDate);
-    const icon         = item.authorizeDate ? 'check-circle' : item.denyDate ? 'times-circle' : 'hourglass-half';
-    const action       = item.authorizeDate ? 'Autorizado': item.denyDate ? 'Negado' : 'Aguardando ação';
-    const visitorColor = item.authorizeDate ? Colors.DEFAULT_TEXT : item.denyDate ? Colors.ERROR : Colors.LIGHT_TEXT;
+  renderVisitor = ({item}) => {
+    const creationDate   = item.creationDate && new Date(item.creationDate);
+    const dateTimeString = Dates.getDateString(creationDate) + ' ' + Dates.getTimeString(creationDate);
 
     return (
-      <View style={styles.visitContainer}>
-        <View style={styles.visitInfo}>
-          <Text style={[styles.visitorText, { color: visitorColor }]}>{item.visitor.name}</Text>
-          <View style={styles.authorContainer}>
-            <FontAwesomeIcon icon={icon} color={styles.authorText.color} size={styles.authorText.fontSize} />
-            <Text style={styles.authorText}>{action} por {item.author.name}</Text>
-          </View>
+      <View style={styles.visitorContainer}>
+        <View style={styles.visitorInfo}>
+          <Text style={styles.visitorText}>{item.name}</Text>
+          <Text style={styles.authorText}>Adicionado {dateTimeString}</Text>
         </View>
 
-        <View style={styles.visitDate}>
-          <Text style={styles.dateText}>{Dates.getDateString(creationDate)}</Text>
-          <Text style={styles.timeText}>{Dates.getTimeString(creationDate)}</Text>
-        </View>
+        <FontAwesomeIcon icon="chevron-right" color={styles.visitorText.color} size={styles.visitorText.fontSize} />
       </View>
     );
   }
@@ -110,7 +102,7 @@ const styles = StyleSheet.create({
     color: Colors.DEFAULT_TEXT,
   },
 
-  visitContainer: {
+  visitorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
@@ -118,12 +110,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
 
-  visitInfo: {
+  visitorInfo: {
     flex: 1,
   },
 
   visitorText: {
     fontSize: 16,
+    color: Colors.DEFAULT_TEXT,
   },
 
   authorContainer: {

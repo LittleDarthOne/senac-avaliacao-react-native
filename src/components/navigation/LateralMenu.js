@@ -83,7 +83,7 @@ export default class LateralMenu extends Component {
 
           <MenuGroup title="Visitas">
             <MenuOption navigation={navigation} currentRoute={currentRoute} route="Visits" icon="clipboard-list" label="Minhas visitas" />
-            <MenuOption navigation={navigation} currentRoute={currentRoute} route="Whitelist" icon="clipboard-check" label="Visitantes autorizados" />
+            <MenuOption navigation={navigation} currentRoute={currentRoute} route="Visitors" icon="clipboard-check" label="Visitantes autorizados" />
           </MenuGroup>
 
           <MenuGroup title="Configurações">
