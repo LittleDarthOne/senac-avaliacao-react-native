@@ -29,6 +29,25 @@ class IconButton extends Component {
   };
 };
 
+class FloatingButton extends Component {
+  static defaultProps = {
+    position: {
+      bottom: 16,
+      right: 16,
+    }
+  };
+
+  render() {
+    const { icon, iconColor, iconStyle, position, style, ...otherProps } = this.props;
+
+    return (
+      <TouchableOpacity style={[styles.floationgButtonContainer, position, style]} {...otherProps}>
+        <FontAwesomeIcon size={20} icon={icon} color={iconColor} style={iconStyle} />
+      </TouchableOpacity> 
+    );
+  };
+};
+
 export class PrimaryButton extends Component {
   render() {
     const { style, titleStyle, ...otherProps } = this.props;
@@ -69,6 +88,26 @@ export class SecondaryIconButton extends Component {
   };
 };
 
+export class PrimaryFloatingButton extends Component {
+  render() {
+    const { style, ...otherProps } = this.props;
+
+    return(
+      <FloatingButton style={[styles.primaryContainer, style]} iconColor={styles.primaryTitle.color} {...otherProps} />
+    );
+  };
+};
+
+export class SecondaryFloatingButton extends Component {
+  render() {
+    const { style, ...otherProps } = this.props;
+
+    return(
+      <FloatingButton style={[styles.secondaryContainer, style]} iconColor={styles.secondaryTitle.color} {...otherProps} />
+    );
+  };
+};
+
 const BUTTON_HEIGHT = 50;
 
 const shadow = {  
@@ -90,7 +129,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    //borderWidth: 1,
     borderRadius: (BUTTON_HEIGHT / 2),
     ...shadow,
   },
@@ -102,6 +140,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
+  },
+
+  floationgButtonContainer: {
+    height: 60,
+    width: 60,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 30,
+    position: 'absolute',
   },
 
   roundedButtonTitle: {

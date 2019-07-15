@@ -1,17 +1,29 @@
-import React                                                               from 'react';
-import { createAppContainer, createStackNavigator, createDrawerNavigator } from 'react-navigation';
+import React                                           from 'react';
+import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 
-import LateralMenu from './LateralMenu';
+import { defaultHeaderOptions } from './Header';
+import LateralMenu              from './LateralMenu';
 
-export function createCustomStackNavigator (navigatorRoutes, navigatorConfig) {
-  const Navigator = createStackNavigator(navigatorRoutes, navigatorConfig);
-  return createAppContainer(Navigator);
+import Colors from 'utils/Colors';
+
+export function createCustomStackNavigator (navigatorRoutes, navigatorConfig = {}) {
+  const { defaultNavigationOptions, ...otherConfigs } = navigatorConfig;
+  const defaultConfig = {
+    defaultNavigationOptions: {
+      ...defaultHeaderOptions,
+      ...defaultNavigationOptions,
+    },
+    ...otherConfigs,
+  };
+  
+  return createStackNavigator(navigatorRoutes, defaultConfig);
 };
 
 export function createCustomDrawerNavigator (navigatorRoutes, navigatorConfig = {}) {
+  const defaultConfig = {
+    contentComponent: (props) => <LateralMenu navigation={props.navigation} />,
+    ...navigatorConfig,
+  }
 
-  const contentComponent = (props) => <LateralMenu navigation={props.navigation} />;
-
-  const Navigator = createDrawerNavigator(navigatorRoutes, { contentComponent, ...navigatorConfig });
-  return createAppContainer(Navigator);
+  return createDrawerNavigator(navigatorRoutes, defaultConfig);
 };

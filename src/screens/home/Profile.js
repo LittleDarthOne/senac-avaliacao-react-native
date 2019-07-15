@@ -1,6 +1,8 @@
 import React, { Component }       from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
+import { createCustomStackNavigator }         from 'components/navigation/Navigator';
+import { DrawerButton }                       from 'components/navigation/Header';
 import ScreenContainer                        from 'components/ScreenContainer';
 import ProfilePicture                         from 'components/ProfilePicture';
 import Separator                              from 'components/Separator';
@@ -10,12 +12,16 @@ import { PrimaryLink }                        from 'components/action/Link';
 
 import Colors from 'utils/Colors';
 
-export default class MyProfile extends Component {
+class ProfileScreen extends Component {
+  static navigationOptions = {
+    title: 'Meus dados', 
+    headerLeft: <DrawerButton />
+  };
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
-    this.state ={ 
+    this.state = { 
       loading: true,
       profile: {
         phones: [{}]
@@ -73,7 +79,7 @@ export default class MyProfile extends Component {
     const { navigation }       = this.props;
 
     return (
-      <ScreenContainer title="Meus dados" loading={loading} style={styles.container}>
+      <ScreenContainer loading={loading} style={styles.container}>
         <View style={styles.profilePictureContainer}>
           <ProfilePicture />
         </View>
@@ -180,3 +186,5 @@ const styles = StyleSheet.create({
     borderColor: Colors.PRIMARY,
   },
 });
+
+export default createCustomStackNavigator({ ProfileScreen });

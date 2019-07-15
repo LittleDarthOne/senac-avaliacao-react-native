@@ -1,10 +1,10 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 68135,
-  "expoServerNgrokUrl": "https://fq-5b2.anonymous.senac-avaliacao-react-native.exp.direct",
-  "packagerNgrokUrl": "https://packager.fq-5b2.anonymous.senac-avaliacao-react-native.exp.direct",
-  "ngrokPid": 68277,
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
   "webpackServerPort": 19006
 }

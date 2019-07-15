@@ -1,20 +1,28 @@
-import React, { Component }                 from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import React, { Component }                                   from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import ScreenContainer   from 'components/ScreenContainer';
+import { createCustomStackNavigator }                     from 'components/navigation/Navigator';
+import { DrawerButton }                                   from 'components/navigation/Header';
+import ScreenContainer                                    from 'components/ScreenContainer';
+import { PrimaryFloatingButton, SecondaryFloatingButton } from 'components/action/Button';
 
 import { getVisitors } from 'services/VisitorsService';
 
 import Dates  from 'utils/Dates';
 import Colors from 'utils/Colors';
 
-export default class Visitors extends Component {
+class VisitorsList extends Component {
+  static navigationOptions = {
+    title: 'Visitantes autorizados', 
+    headerLeft: <DrawerButton />
+  };
+
   constructor(props) {
     super(props);
 
-    this.state ={ 
+    this.state = { 
       loading:    true,
       visitors:   [],
       refreshing: false,
@@ -40,12 +48,16 @@ export default class Visitors extends Component {
     });
   };
 
+  navigateToForm = (visitor) => {
+    this.props.navigation.navigate('VisitorForm', { visitor });
+  };
+
   render() {
     const { loading, visitors, refreshing } = this.state;
     const { navigation }                    = this.props;
 
     return (
-      <ScreenContainer title="Visitantes autorizados" loading={loading} scrollable={false} style={styles.container}>
+      <ScreenContainer loading={loading} scrollable={false} style={styles.container}>
         <FlatList
           data={visitors.sort((visitor1, visitor2) => visitor1.name.localeCompare(visitor2.name))}
           keyExtractor={visitor => 'visitor-' + visitor.id}
@@ -54,6 +66,8 @@ export default class Visitors extends Component {
           refreshing={refreshing}
           ListEmptyComponent={this.renderEmpty}
         />
+        
+        <PrimaryFloatingButton icon="plus" onPress={() => this.navigateToForm()} />
       </ScreenContainer> 
     );
   };
@@ -69,18 +83,19 @@ export default class Visitors extends Component {
   };
 
   renderVisitor = ({item}) => {
+    const { navigation } = this.props;
     const creationDate   = item.creationDate && new Date(item.creationDate);
     const dateTimeString = Dates.getDateString(creationDate) + ' ' + Dates.getTimeString(creationDate);
 
     return (
-      <View style={styles.visitorContainer}>
+      <TouchableOpacity style={styles.visitorContainer} onPress={() => this.navigateToForm(item)}>
         <View style={styles.visitorInfo}>
           <Text style={styles.visitorText}>{item.name}</Text>
           <Text style={styles.authorText}>Adicionado {dateTimeString}</Text>
         </View>
 
         <FontAwesomeIcon icon="chevron-right" color={styles.visitorText.color} size={styles.visitorText.fontSize} />
-      </View>
+      </TouchableOpacity>
     );
   }
 };
@@ -97,7 +112,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
     color: Colors.DEFAULT_TEXT,
   },
@@ -146,3 +161,5 @@ const styles = StyleSheet.create({
   },
 
 });
+
+export default createCustomStackNavigator({ VisitorsList });

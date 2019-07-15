@@ -1,11 +1,10 @@
-import React, { Component }                                                           from 'react';
-import { StyleSheet, View, KeyboardAvoidingView, StatusBar, ActivityIndicator, Text } from 'react-native';
-import { SafeAreaView }                                                               from 'react-navigation';
-
-import Colors from 'utils/Colors';
+import React, { Component }                                                from 'react';
+import { StyleSheet, View, KeyboardAvoidingView, ActivityIndicator, Text } from 'react-native';
+import { SafeAreaView }                                                    from 'react-navigation';
 
 import ScrollableView from './ScrollableView';
-import MainHeader     from './navigation/MainHeader';
+
+import Colors from 'utils/Colors';
 
 export default class ScreenContainer extends Component {
   static defaultProps = {
@@ -18,42 +17,35 @@ export default class ScreenContainer extends Component {
     const mainHeaderProps = { title, subtitle, rightIcon, onPressRightIcon };
 
     return (
-      <SafeAreaView style={{flexGrow: 1}}>
-        <KeyboardAvoidingView behavior="padding" style={styles.keyboardAvoidingView}>
-          <StatusBar barStyle="light-content" />
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
 
-          {title && <MainHeader {...mainHeaderProps} />}
+        {scrollable && (
+          <ScrollableView contentContainerStyle={[styles.contentContainer, style]} {...containerViewProps}>
+            {this.props.children}
+          </ScrollableView>
+        )}
 
-          {scrollable && (
-            <ScrollableView contentContainerStyle={[styles.contentContainer, style]} {...containerViewProps}>
-              {this.props.children}
-            </ScrollableView>
-          )}
+        {!scrollable && (
+          <View style={[styles.contentContainer, style]} {...containerViewProps}>
+            {this.props.children}
+          </View>
+        )}
 
-          {!scrollable && (
-            <View style={[styles.contentContainer, style]} {...containerViewProps}>
-              {this.props.children}
-            </View>
-          )}
-
-          {loading && (
-            <View style={styles.loadingOverlay}>
-              <View style={styles.loadingOverlayBackground} />
-              <ActivityIndicator size="large" color={Colors.WHITE} />
-              {loadingMessage && <Text style={styles.loadingMessage}>{loadingMessage}</Text>}
-            </View>
-          )}
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingOverlayBackground} />
+            <ActivityIndicator size="large" color={Colors.WHITE} />
+            {loadingMessage && <Text style={styles.loadingMessage}>{loadingMessage}</Text>}
+          </View>
+        )}
+      </KeyboardAvoidingView>
     );
   };
 };
 
 const styles = StyleSheet.create({
-  keyboardAvoidingView: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-    backgroundColor: Colors.PRIMARY,
+  container: {
+    flexGrow: 1,
   },
 
   contentContainer: {

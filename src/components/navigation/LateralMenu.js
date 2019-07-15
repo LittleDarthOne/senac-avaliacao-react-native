@@ -1,13 +1,13 @@
-import React, { Component }                         from 'react';
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import React, { Component }                                    from 'react';
+import { StatusBar, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 
-import ScreenContainer       from 'components/ScreenContainer';
-import ProfilePicture        from 'components/ProfilePicture';
-import { PrimaryButton }     from 'components/action/Button';
+import ScreenContainer     from 'components/ScreenContainer';
+import ProfilePicture      from 'components/ProfilePicture';
+import { PrimaryButton }   from 'components/action/Button';
 
-import { FontAwesomeIcon }   from '@fortawesome/react-native-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import Colors                from 'utils/Colors';
+import Colors              from 'utils/Colors';
 
 const navigate = (navigation, route) => {
   if (route && route.trim().length) {
@@ -82,12 +82,12 @@ export default class LateralMenu extends Component {
           </TouchableOpacity>
 
           <MenuGroup title="Visitas">
-            <MenuOption navigation={navigation} currentRoute={currentRoute} route="Visits" icon="clipboard-list" label="Minhas visitas" />
-            <MenuOption navigation={navigation} currentRoute={currentRoute} route="Visitors" icon="clipboard-check" label="Visitantes autorizados" />
+            <MenuOption navigation={navigation} currentRoute={currentRoute} route="VisitsList" icon="clipboard-list" label="Minhas visitas" />
+            <MenuOption navigation={navigation} currentRoute={currentRoute} route="VisitorsList" icon="clipboard-check" label="Visitantes autorizados" />
           </MenuGroup>
 
           <MenuGroup title="Configurações">
-            <MenuOption navigation={navigation} currentRoute={currentRoute} route="" icon="cogs" label="Configurações gerais" />
+            <MenuOption navigation={navigation} currentRoute={currentRoute} route="Config" icon="cogs" label="Configurações" />
           </MenuGroup>
         </View>
 
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.PRIMARY,
+    paddingTop: 16 + StatusBar.currentHeight,
     padding: 16,
   },
 

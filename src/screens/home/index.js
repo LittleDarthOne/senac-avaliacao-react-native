@@ -1,15 +1,26 @@
 import React from 'react';
 
-import { createCustomDrawerNavigator } from 'components/navigation/Navigator';
+import { createCustomDrawerNavigator, createCustomStackNavigator } from 'components/navigation/Navigator';
 
-import Visits   from './Visits';
-import Visitors from './Visitors';
-import Profile  from './Profile';
+import VisitsList   from './VisitsList';
+import VisitorsList from './VisitorsList';
+import VisitorForm  from './VisitorForm';
+import Profile      from './Profile';
+import Config       from './Config';
 
-const navigatorRoutes = {
-  Visits,
-  Visitors,
+const drawerRoutes = {
+  VisitsList,
+  VisitorsList,
   Profile,
+  Config,
 };
 
-export default createCustomDrawerNavigator(navigatorRoutes);
+const DrawerNavigator = createCustomDrawerNavigator(drawerRoutes);
+DrawerNavigator.navigationOptions = { header: null };
+
+const stackRoutes = {
+  DrawerNavigator,
+  VisitorForm,
+}
+
+export default createCustomStackNavigator(stackRoutes);

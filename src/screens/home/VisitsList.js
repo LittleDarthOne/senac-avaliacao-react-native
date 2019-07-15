@@ -3,18 +3,25 @@ import { StyleSheet, View, Text, FlatList } from 'react-native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import ScreenContainer   from 'components/ScreenContainer';
+import { createCustomStackNavigator } from 'components/navigation/Navigator';
+import { DrawerButton }               from 'components/navigation/Header';
+import ScreenContainer                from 'components/ScreenContainer';
 
 import { getVisits } from 'services/VisitsService';
 
 import Dates  from 'utils/Dates';
 import Colors from 'utils/Colors';
 
-export default class MyVisits extends Component {
+class VisitsList extends Component {
+  static navigationOptions = {
+    title: 'Minhas visitas', 
+    headerLeft: <DrawerButton />
+  };
+
   constructor(props) {
     super(props);
 
-    this.state ={ 
+    this.state = { 
       loading:    true,
       visits:     [],
       refreshing: false,
@@ -31,7 +38,6 @@ export default class MyVisits extends Component {
   };
 
   loadData = async (load) => {
-    const now = new Date();
     const loadedData = await getVisits();
     this.setState({
       loading:    false,
@@ -45,7 +51,7 @@ export default class MyVisits extends Component {
     const { navigation }                  = this.props;
 
     return (
-      <ScreenContainer title="Minhas visitas" loading={loading} scrollable={false} style={styles.container}>
+      <ScreenContainer loading={loading} scrollable={false} style={styles.container}>
         <FlatList
           data={visits.sort((visit1, visit2) => visit2.createDate - visit1.createDate)}
           keyExtractor={visit => 'visit-' + visit.id}
@@ -105,7 +111,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
     color: Colors.DEFAULT_TEXT,
   },
@@ -153,3 +159,5 @@ const styles = StyleSheet.create({
   },
 
 });
+
+export default createCustomStackNavigator({ VisitsList });
