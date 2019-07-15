@@ -1,5 +1,5 @@
 import React, { Component }                                    from 'react';
-import { StatusBar, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { Platform, StatusBar, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 
 import ScreenContainer     from 'components/ScreenContainer';
 import ProfilePicture      from 'components/ProfilePicture';
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.PRIMARY,
-    paddingTop: 16 + StatusBar.currentHeight,
+    paddingTop:  Platform.OS === 'android' ? (16 + StatusBar.currentHeight) : 20,
     padding: 16,
   },
 

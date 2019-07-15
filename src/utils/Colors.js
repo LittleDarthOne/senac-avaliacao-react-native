@@ -8,7 +8,7 @@ export default class Colors {
   static SUCCESS = '#3F3';
 
   static DEFAULT_TEXT     = '#666';
-  static LIGHT_TEXT       = '#AAA';
+  static LIGHT_TEXT       = '#BCBCBC';
   static EXTRA_LIGHT_TEXT = '#EFEFEF';
 
   static random = () => {

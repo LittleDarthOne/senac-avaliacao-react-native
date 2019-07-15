@@ -7,6 +7,7 @@ import ScreenContainer                        from 'components/ScreenContainer';
 import ProfilePicture                         from 'components/ProfilePicture';
 import Separator                              from 'components/Separator';
 import InputText                              from 'components/inputs/InputText';
+import InputPicker                            from 'components/inputs/InputPicker';
 import { PrimaryButton, SecondaryIconButton } from 'components/action/Button';
 import { PrimaryLink }                        from 'components/action/Link';
 
@@ -106,6 +107,18 @@ class ProfileScreen extends Component {
           value={profile.cpf}
           onChangeText={(text) => this.setState(state => {
             state.profile.cpf = text;
+            return state;
+          })}
+        />
+        
+        <InputPicker 
+          style={styles.input}
+          label="Residência"
+          leftIcon="home" 
+          placeholder="Selecione a sua residência" 
+          value={profile.residence}
+          onChange={(residence) => this.setState(state => {
+            state.profile.residence = residence;
             return state;
           })}
         />
