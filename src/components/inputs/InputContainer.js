@@ -43,6 +43,13 @@ const styles = StyleSheet.create({
   rightIcon: {
     marginLeft: 8,
   },
+
+  childrenContainer: {
+    flex: 1, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    height: 22, 
+  },
 });
 
 export default class InputPicker extends Component {
@@ -58,9 +65,11 @@ export default class InputPicker extends Component {
         {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
         <InputContainerComponent style={[styles.inputContainer, inputStyle]} onPress={onPress}>
           {leftIcon && <FontAwesomeIcon size={16} icon={leftIcon} color={styles.inputText.color} style={styles.leftIcon} />}
-          <View style={{flex: 1, height: 22, flexDirection: 'row', alignItems: 'center', borderColor: 'red', borderWidth: 1}}>
-          {children}
+
+          <View style={styles.childrenContainer}>
+            {children}
           </View>
+          
           {rightIcon && <FontAwesomeIcon size={16} icon={rightIcon} color={styles.inputText.color} style={styles.rightIcon} />}
         </InputContainerComponent>
       </View> 

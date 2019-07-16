@@ -10,7 +10,7 @@ class RoundedButton extends Component {
     const { title, style, titleStyle, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.roundedButtonContainer, style]} {...otherProps}>
+      <TouchableOpacity style={[styles.roundedButtonContainer, otherProps.disabled && styles.disabled, style]} {...otherProps}>
         <Text style={[styles.roundedButtonTitle, titleStyle]}>{title}</Text>
       </TouchableOpacity> 
     );
@@ -22,7 +22,7 @@ class IconButton extends Component {
     const { icon, iconColor, iconStyle, style, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.iconButtonContainer, style]} {...otherProps}>
+      <TouchableOpacity style={[styles.iconButtonContainer, otherProps.disabled && styles.disabled, style]} {...otherProps}>
         <FontAwesomeIcon size={20} icon={icon} color={iconColor} style={iconStyle} />
       </TouchableOpacity> 
     );
@@ -41,7 +41,7 @@ class FloatingButton extends Component {
     const { icon, iconColor, iconStyle, position, style, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.floationgButtonContainer, position, style]} {...otherProps}>
+      <TouchableOpacity style={[styles.floationgButtonContainer, position, otherProps.disabled && styles.disabled, style]} {...otherProps}>
         <FontAwesomeIcon size={20} icon={icon} color={iconColor} style={iconStyle} />
       </TouchableOpacity> 
     );
@@ -175,5 +175,9 @@ const styles = StyleSheet.create({
 
   secondaryTitle: {
     color: Colors.PRIMARY, 
+  },
+
+  disabled: {
+    opacity: 0.5,
   },
 });

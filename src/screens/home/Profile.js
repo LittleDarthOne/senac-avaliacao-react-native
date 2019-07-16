@@ -11,6 +11,9 @@ import InputPicker                            from 'components/inputs/InputPicke
 import { PrimaryButton, SecondaryIconButton } from 'components/action/Button';
 import { PrimaryLink }                        from 'components/action/Link';
 
+import { getResidences } from 'services/ResidencesService';
+import { getProfile }    from 'services/ProfilesService';
+
 import Colors from 'utils/Colors';
 
 class ProfileScreen extends Component {
@@ -19,33 +22,26 @@ class ProfileScreen extends Component {
     headerLeft: <DrawerButton />
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = { 
-      loading: true,
-      profile: {
-        phones: [{}]
-      },
-    };
+  state = { 
+    loading: true,
+    profile: {
+      phones: [{}]
+    },
+    residences: [],
   };
 
   componentDidMount() {
-    this.setProfile({
-      name: 'Jeferson',
-      cpf: '00969074018',
-      email: 'jef.oli@gmail.com',
-      phones: [{}],
-    });
+    this.loadData();
   };
 
-  setProfile = (profile) => {
-    if (profile && !profile.phones)
-      profile.phones = [{}];
+  loadData = async () => {
+    const residences = await getResidences();
+    const profile    = await getProfile();
 
     this.setState({
-      loading: false,
-      profile: profile,
+      loading:    false,
+      residences,
+      profile,
     });
   };
 
@@ -76,8 +72,8 @@ class ProfileScreen extends Component {
   };
 
   render() {
-    const { loading, profile } = this.state;
-    const { navigation }       = this.props;
+    const { loading, profile, residences } = this.state;
+    const { navigation }                   = this.props;
 
     return (
       <ScreenContainer loading={loading} style={styles.container}>
@@ -88,12 +84,12 @@ class ProfileScreen extends Component {
         <InputText 
           style={styles.input}
           textContentType="name" 
-          label="Nome" 
+          label="Nome"
           leftIcon="user"
           placeholder="Informe seu nome" 
           value={profile.name}
-          onChangeText={(text) => this.setState(state => {
-            state.profile.name = text;
+          onChangeText={(name) => this.setState(state => {
+            state.profile.name = name;
             return state;
           })}
         />
@@ -105,8 +101,8 @@ class ProfileScreen extends Component {
           leftIcon="id-card" 
           placeholder="Informe seu CPF" 
           value={profile.cpf}
-          onChangeText={(text) => this.setState(state => {
-            state.profile.cpf = text;
+          onChangeText={(cpf) => this.setState(state => {
+            state.profile.cpf = cpf;
             return state;
           })}
         />
@@ -117,6 +113,8 @@ class ProfileScreen extends Component {
           leftIcon="home" 
           placeholder="Selecione a sua residência" 
           value={profile.residence}
+          data={residences}
+          itemLabelExtractor={residence => `${residence.residenceGroup.name} ${residence.name}`}
           onChange={(residence) => this.setState(state => {
             state.profile.residence = residence;
             return state;
@@ -133,8 +131,8 @@ class ProfileScreen extends Component {
           leftIcon="at"
           placeholder="Informe o seu e-mail" 
           value={profile.email}
-          onChangeText={(text) => this.setState(state => {
-            state.profile.email = text;
+          onChangeText={(email) => this.setState(state => {
+            state.profile.email = email;
             return state;
           })}
         />
@@ -149,12 +147,12 @@ class ProfileScreen extends Component {
               leftIcon="phone"
               placeholder="Informe o número do telefone" 
               value={phone.number}
-              onChangeText={(text) => this.setState(state => {
-                phone.number = text;
+              onChangeText={(phoneNumber) => this.setState(state => {
+                phone.number = phoneNumber;
                 return state;
               })}
             />
-            <SecondaryIconButton icon="trash-alt" style={styles.deleteButton} onPress={() => this.removePhone(index)} /> 
+            <SecondaryIconButton icon="trash-alt" style={styles.deleteButton} onPress={() => this.removePhone(index)} disabled={profile.phones.length < 2} /> 
           </View>
         })}
 

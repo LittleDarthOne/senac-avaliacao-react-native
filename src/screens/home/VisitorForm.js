@@ -9,25 +9,42 @@ import Colors from 'utils/Colors';
 
 export default class ConfigScreen extends Component {
   static navigationOptions = {
-    title: 'Formulário de visitante', 
+    title: 'Visitante', 
   };
 
-  constructor(props){
+  componentDidMount() {
+    this.props.navigation.setParams({ 
+      title: 'Novo visitante', 
+    });
+  };
+
+  constructor(props) {
     super(props);
+
+    const visitor = props.navigation.getParam('visitor', {});
 
     this.state = { 
       loading: false,
+      visitor,
     };
   };
 
   render() {
-    const { loading } = this.state;
+    const { loading, visitor } = this.state;
 
     return (
       <ScreenContainer loading={loading} scrollable={false} style={styles.container}>
         <InputText 
-          label="Nome" 
+          style={styles.input}
+          textContentType="name" 
+          label="Nome"
+          leftIcon="user"
           placeholder="Informe o nome do visitante" 
+          value={visitor.name}
+          onChangeText={(name) => this.setState(state => {
+            state.visitor.name = name;
+            return state;
+          })}
         />
       </ScreenContainer>
     );
@@ -39,16 +56,8 @@ const styles = StyleSheet.create({
     padding: 24,
   },
 
-  emptyContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-
-  emptyText: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: Colors.DEFAULT_TEXT,
+  input: {
+    marginBottom: 24,
   },
 
 });

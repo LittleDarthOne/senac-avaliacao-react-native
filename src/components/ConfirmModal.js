@@ -1,82 +1,52 @@
-import React, { Component }        from 'react';
-import { StyleSheet, Modal, View } from 'react-native';
+import React, { Component }                                  from 'react';
+import { StyleSheet, Modal, View, TouchableWithoutFeedback } from 'react-native';
 
 import { PrimaryButton } from 'components/action/Button';
 import { PrimaryLink }   from 'components/action/Link';
 
 import Colors from 'utils/Colors';
 
-export default class ConfirmModal extends React.Component {
+export default class ConfirmModal extends Component {
+
   static defaultProps = {
-    cancelLabel: 'Cancelar',
+    cancelLabel:  'Cancelar',
     confirmLabel: 'Confirmar',
+    dismissable:  true,
   };
 
-  state = {
-    visible: this.props.visible
+  handleCancel = () => {
+    const { onCancel } = this.props;
+    if (onCancel)
+      onCancel();
   };
 
-  _handleCancel = () => {
-    this.close(this.props.onCancel);
-  };
-
-  _handleConfirm = () => {
-    this.close(this.props.onConfirm);
-  };
-
-  open = (callback) => {
-    this.setState({ visible: true }, () => {
-      if (this.props.onOpen)
-        this.props.onOpen();
-
-      if (callback)
-        callback();
-    });
-  };
-
-  close = (callback) => {
-    this.setState({ visible: false }, () => {
-      if (this.props.onClose)
-        this.props.onClose();
-
-      if (callback)
-        callback();
-    });
-  };
-
-  toggle = () => {
-    if (!this.state.open)
-      this.open();
-    else
-      this.close();
-  };
-
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.visible && nextProps.visible)
-      this.open();
-    else if (this.props.visible && !nextProps.visible)
-      this.close();
+  handleConfirm = () => {
+    const { onConfirm } = this.props;
+    if (onConfirm)
+      onConfirm();
   };
 
   render() {
-    const { contentContainerStyle, children, confirmLabel, cancelLabel, disabled } = this.props;
+    const { confirmLabel, cancelLabel, disabled, dismissable, contentContainerStyle, children, ...modalProps } = this.props;
 
     return (
       <Modal
+        {...modalProps}
         animationType="none"
         transparent={true}
-        visible={this.state.visible}
       >
-        <View style={styles.overlay} />
+        <TouchableWithoutFeedback style={StyleSheet.absoluteFillObject} onPress={() => dismissable && this.handleCancel()}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
         
         <View style={styles.contentContainer}>
-          <View style={[styles.childrenContainer, this.props.contentContainerStyle]}>
-            {this.props.children}
+          <View style={[styles.childrenContainer, contentContainerStyle]}>
+            {children}
           </View>
 
           <View style={styles.buttonsContainer}>
-            <PrimaryButton style={styles.actionButton} title={this.props.confirmLabel} disabled={this.props.disabled} onPress={this._handleConfirm} />
-            <PrimaryLink style={styles.cancelActionLink} onPress={this._handleCancel} text={this.props.cancelLabel} />
+            <PrimaryButton style={styles.actionButton} title={confirmLabel} disabled={disabled} onPress={this.handleConfirm} />
+            <PrimaryLink style={styles.actionLink} onPress={this.handleCancel} text={cancelLabel} />
           </View>
         </View>
       </Modal>
@@ -113,7 +83,7 @@ const styles = StyleSheet.create({
     margin: 8,
   },
 
-  cancelActionLink: {
-    marginTop: 12,
+  actionLink: {
+    marginTop: 8,
   }
 });
