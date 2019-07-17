@@ -8,10 +8,13 @@ export default class InputText extends Component {
     const { label, leftIcon, rightIcon, style, labelStyle, inputStyle, onPress, ...inputProps } = this.props;
     const inputContainerProps = { label, leftIcon, rightIcon, style, labelStyle, inputStyle };
 
+    const isMultiline           = inputProps.multiline && inputProps.numberOfLines;
+    const contentContainerStyle = isMultiline ? { height: InputContainer.HEIGHT * inputProps.numberOfLines } : {};
+
     return (
-      <InputContainer {...inputContainerProps}>
+      <InputContainer contentContainerStyle={contentContainerStyle} {...inputContainerProps}>
         <TextInput 
-          style={InputContainer.textStyle} 
+          style={[InputContainer.textStyle, isMultiline && { textAlignVertical: 'top' }]} 
           placeholderTextColor={InputContainer.placeholderTextStyle.color} 
           {...inputProps} 
         />

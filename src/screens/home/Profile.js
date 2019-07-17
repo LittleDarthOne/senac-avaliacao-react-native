@@ -12,7 +12,7 @@ import { PrimaryButton, SecondaryIconButton } from 'components/action/Button';
 import { PrimaryLink }                        from 'components/action/Link';
 
 import { getResidences } from 'services/ResidencesService';
-import { getProfile }    from 'services/ProfilesService';
+import ProfileService    from 'services/ProfileService';
 
 import Colors from 'utils/Colors';
 
@@ -36,7 +36,7 @@ class ProfileScreen extends Component {
 
   loadData = async () => {
     const residences = await getResidences();
-    const profile    = await getProfile();
+    const profile    = await ProfileService.get();
 
     this.setState({
       loading:    false,

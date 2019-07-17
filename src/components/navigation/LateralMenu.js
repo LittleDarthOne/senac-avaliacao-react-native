@@ -7,6 +7,9 @@ import { PrimaryButton }   from 'components/action/Button';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
+import ProfileService      from 'services/ProfileService';
+import { logout }          from 'services/AuthenticationService';
+
 import Colors              from 'utils/Colors';
 
 const navigate = (navigation, route) => {
@@ -51,17 +54,32 @@ class MenuOption extends Component {
 
 export default class LateralMenu extends Component {
 
-  state = { profile: { name: 'Jeferson'} };
+  state = { 
+    profile: {}, 
+  };
 
   componentDidMount() {
+    this.loadProfile();
   };
+
+  loadProfile = async () => {
+    try {
+      const profile = await ProfileService.get();
+      this.setState({ profile });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   componentWillUnmount() {
   };
 
   attemptLogout = () => {
-    const { navigation } = this.props;
-    navigation.navigate('Authentication');
+    try {
+      logout();
+    } finally {
+      this.props.navigation.navigate('Authentication');
+    }
   };
 
   render() {

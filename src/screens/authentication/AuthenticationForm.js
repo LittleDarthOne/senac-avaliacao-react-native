@@ -1,12 +1,14 @@
 import React, { Component }       from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-import Colors from 'utils/Colors';
-
 import ScreenContainer     from 'components/ScreenContainer';
 import InputText           from 'components/inputs/InputText';
 import { SecondaryButton } from 'components/action/Button';
 import { SecondaryLink }   from 'components/action/Link';
+
+import { login }           from 'services/AuthenticationService';
+
+import Colors              from 'utils/Colors';
 
 const CREATION_MODE = 'create';
 const AUTHENTICATION_MODE = 'authenticate';
@@ -28,16 +30,28 @@ export default class AuthenticationForm extends Component {
     };
   };
 
-  handleButtonPress = () => {
+  handleButtonPress = async () => {
     const { mode, username, password } = this.state;
-    const loadingMessage = mode == AUTHENTICATION_MODE ? 'Autenticando, aguarde...' : 'Criando seu cadastro, aguarde...';
+    const { navigation }               = this.props;
 
-    this.setState({ error: undefined, loading: true, loadingMessage });
+    this.setState({ 
+      error: undefined, 
+      loading: true, 
+      loadingMessage: mode == AUTHENTICATION_MODE ? 'Autenticando, aguarde...' : 'Criando seu cadastro, aguarde...', 
+    });
 
-    if (mode == AUTHENTICATION_MODE) {
-      this.props.navigation.navigate('Home');
-    } else {
-      this.props.navigation.navigate('Home');
+    try {
+      if (mode == AUTHENTICATION_MODE) {
+        await login({ username, password });
+        navigation.navigate('Home');
+      } else {
+        await login({ username, password });
+        navigation.navigate('Home');
+      }
+    } catch(error) {
+      this.setState({ error });
+    } finally {
+      this.setState({ loading: false });
     }
   };
 
@@ -106,6 +120,7 @@ const styles = StyleSheet.create({
   },
 
   error: {
+    textAlign: 'center',
     color: Colors.WHITE,
     opacity: 0.5,
     marginBottom: 16,

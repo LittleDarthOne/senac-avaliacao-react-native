@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import Colors from 'utils/Colors';
 
+const HEIGHT = 22;
+
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'stretch',
@@ -46,27 +48,26 @@ const styles = StyleSheet.create({
 
   childrenContainer: {
     flex: 1, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    height: 22, 
+    height: HEIGHT, 
   },
 });
 
 export default class InputPicker extends Component {
+  static HEIGHT = HEIGHT;
   static textStyle = styles.inputText;
   static placeholderTextStyle = styles.inputPlaceholderText;
 
   render() {
-    const { label, leftIcon, rightIcon, style, labelStyle, inputStyle, onPress, children } = this.props;
+    const { label, leftIcon, rightIcon, style, labelStyle, inputContainerStyle, contentContainerStyle, onPress, children } = this.props;
     const InputContainerComponent = onPress ? TouchableOpacity : View;
 
     return (
       <View style={[styles.container, style]}>
         {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
-        <InputContainerComponent style={[styles.inputContainer, inputStyle]} onPress={onPress}>
+        <InputContainerComponent style={[styles.inputContainer, inputContainerStyle]} onPress={onPress}>
           {leftIcon && <FontAwesomeIcon size={16} icon={leftIcon} color={styles.inputText.color} style={styles.leftIcon} />}
 
-          <View style={styles.childrenContainer}>
+          <View style={[styles.childrenContainer, contentContainerStyle]}>
             {children}
           </View>
           
