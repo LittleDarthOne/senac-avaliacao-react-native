@@ -1,5 +1,5 @@
-import React, { Component }       from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { Component }              from 'react';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 
 import { createCustomStackNavigator }         from 'components/navigation/Navigator';
 import { DrawerButton }                       from 'components/navigation/Header';
@@ -11,8 +11,8 @@ import InputPicker                            from 'components/inputs/InputPicke
 import { PrimaryButton, SecondaryIconButton } from 'components/action/Button';
 import { PrimaryLink }                        from 'components/action/Link';
 
-import { getResidences } from 'services/ResidencesService';
-import ProfileService    from 'services/ProfileService';
+import { getResidences }           from 'services/ResidencesService';
+import { getProfile, saveProfile } from 'services/ProfileService';
 
 import Colors from 'utils/Colors';
 
@@ -23,11 +23,9 @@ class ProfileScreen extends Component {
   };
 
   state = { 
-    loading: true,
-    profile: {
-      phones: [{}]
-    },
+    profile:    { phones: [{}] },
     residences: [],
+    loading:    true,
   };
 
   componentDidMount() {
@@ -35,13 +33,13 @@ class ProfileScreen extends Component {
   };
 
   loadData = async () => {
+    const profile    = await getProfile();
     const residences = await getResidences();
-    const profile    = await ProfileService.get();
 
     this.setState({
-      loading:    false,
+      loading: false,
+      profile: {...profile},
       residences,
-      profile,
     });
   };
 
@@ -61,14 +59,20 @@ class ProfileScreen extends Component {
     });
   };
 
-  save = () => {
+  save = async () => {
     const { profile } = this.state;
 
-    this.setState({
-      loading: true,
-    });
+    this.setState({ loading: true, });
 
-    this.setProfile(profile);
+    try {
+      const savedProfile = await saveProfile(profile);
+      this.setState({ profile: {...savedProfile} });
+      Alert.alert(undefined, 'Perfil salvo com sucesso!', [{text: 'OK' }]);
+    } catch(error) {
+      Alert.alert(undefined, error, [{text: 'OK' }]);
+    } finally {
+      this.setState({ loading: false });
+    }
   };
 
   render() {
@@ -96,7 +100,9 @@ class ProfileScreen extends Component {
         
         <InputText 
           style={styles.input}
+          textContentType="username"
           keyboardType="number-pad" 
+          maxLength={11} 
           label="CPF" 
           leftIcon="id-card" 
           placeholder="Informe seu CPF" 

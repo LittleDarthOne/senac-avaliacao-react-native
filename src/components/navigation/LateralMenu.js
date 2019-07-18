@@ -7,10 +7,10 @@ import { PrimaryButton }   from 'components/action/Button';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import ProfileService      from 'services/ProfileService';
-import { logout }          from 'services/AuthenticationService';
+import { getProfile, addProfileSaveListener } from 'services/ProfileService';
+import { logout }                             from 'services/AuthenticationService';
 
-import Colors              from 'utils/Colors';
+import Colors from 'utils/Colors';
 
 const navigate = (navigation, route) => {
   if (route && route.trim().length) {
@@ -64,14 +64,17 @@ export default class LateralMenu extends Component {
 
   loadProfile = async () => {
     try {
-      const profile = await ProfileService.get();
+      const profile = await getProfile();
       this.setState({ profile });
+      this.profileListener = addProfileSaveListener(profile => this.setState({ profile: profile || {} }));
     } catch (error) {
       console.log(error);
     }
   }
 
   componentWillUnmount() {
+    if (this.profileListener)
+      this.profileListener.remove();
   };
 
   attemptLogout = () => {

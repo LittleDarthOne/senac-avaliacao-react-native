@@ -1,8 +1,10 @@
 import { AsyncStorage } from 'react-native';
 
-import ProfileService   from './ProfileService';
+import { getProfile }   from './ProfileService';
 
 import Dates  from 'utils/Dates';
+
+AsyncStorage.removeItem('visitors');
 
 const visitorsList = [
   {
@@ -49,7 +51,7 @@ export const addVisitor = async (visitor) => {
 
   visitor.creationDate  = new Date();
   visitor.authorizeDate = visitor.creationDate;
-  visitor.author        = ProfileService.get();
+  visitor.author        = getProfile();
   visitor.residence     = visitor.author.residence;
   visitor.id = visitors.length + 1;
 

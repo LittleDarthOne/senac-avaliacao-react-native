@@ -11,8 +11,10 @@ import { addVisitor }    from 'services/VisitorsService';
 import Colors from 'utils/Colors';
 
 export default class ConfigScreen extends Component {
-  static navigationOptions = {
-    title: 'Visitante', 
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.getParam('title', 'Visitante'),
+    };
   };
 
   constructor(props) {
@@ -22,13 +24,13 @@ export default class ConfigScreen extends Component {
 
     this.state = { 
       loading: false,
-      visitor,
+      visitor: {...visitor},
     };
   };
 
   componentDidMount() {
     this.props.navigation.setParams({ 
-      title: this.state.visitor.id ? 'Edição de visitante' : 'Novo visitante', 
+      title: this.state.visitor.id ? 'Modificar visitante' : 'Adicionar visitante', 
     });
   };
 
@@ -52,7 +54,7 @@ export default class ConfigScreen extends Component {
         <InputText 
           style={styles.input}
           textContentType="name" 
-          label="Nome"
+          label={"Nome " + visitor.id}
           leftIcon="user"
           placeholder="Informe o nome do visitante" 
           value={visitor.name}
