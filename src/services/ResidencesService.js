@@ -1,37 +1,38 @@
-import { AsyncStorage } from 'react-native';
+import HTTPService            from './HTTPService';
 
-const getMockupList = () => {
-  function getResidences(residenceGroup) {
-    return [...Array(3)].map((item, index) => ({
-      id: (residenceGroup.id * 10) + index,
-      name: '10' + (index + 1), 
-      description: 'Apartamento 10' + (index + 1),
-      residenceGroup,
-    }))
-  }
-
-  return [
-    ...getResidences({id: 1, name: 'A', description: 'Bloco A',}),
-    ...getResidences({id: 2, name: 'B', description: 'Bloco B',}),
-    ...getResidences({id: 3, name: 'C', description: 'Bloco C',}),
-  ];
+const __requestResidenceGroups = async () => {
+  const response = await HTTPService.get('/residence-groups');
+  return (response && response.data) || [];
 };
 
-const getStorageList = async () => {
-  const stringfied = await AsyncStorage.getItem('residenceGroups');
-  return stringfied && stringfied.length ? JSON.parse(stringfied) : [];
-}
-
-const setStorageList = async (residenceGroups) => {
-  await AsyncStorage.setItem('residenceGroups', JSON.stringify(residenceGroups));
+const __requestResidences = async (residenceGroup) => {
+  const response = await HTTPService.get(`/residence-groups/${residenceGroup.id}/residences`);
+  return (response && response.data) || [];
 };
 
 export const getResidences = async () => {
-  let residenceGroups = await getStorageList();
+  try {
+    let result = [];
 
-  if (!residenceGroups.length) {
-    residenceGroups = getMockupList();
-    setStorageList(residenceGroups);
+    const residenceGroups = await __requestResidenceGroups();
+    for (const groupIndex in residenceGroups) {
+      const residenceGroup = residenceGroups[groupIndex];
+
+      const residences = await __requestResidences(residenceGroup);
+      for (const residenceIndex in residences) {
+        let residence = residences[residenceIndex];
+        
+        residence.residenceGroup = residenceGroup;
+        result.push(residence);
+      }
+    }
+
+    console.log(result.length, 'RESIDENCES LOADED:', result);
+    return result;
+  } catch(error) {
+    const { data } = error.response;
+    console.log('GET RESIDENCES ERROR:', data);
+
+    throw 'Ocorreu um problema inesperado';
   }
-  return residenceGroups;
 };

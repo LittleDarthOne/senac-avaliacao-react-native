@@ -7,6 +7,7 @@ import { SecondaryButton } from 'components/action/Button';
 import { SecondaryLink }   from 'components/action/Link';
 
 import { login }           from 'services/AuthenticationService';
+import { createProfile }   from 'services/ProfileService';
 
 import Colors              from 'utils/Colors';
 
@@ -45,6 +46,11 @@ export default class AuthenticationForm extends Component {
         await login({ username, password });
         navigation.navigate('Home');
       } else {
+        const newProfile = await createProfile({ username, password });
+        console.log('PROFILE CREATED:', newProfile);
+
+        this.setState({ loadingMessage: 'Autenticando, aguarde...' });
+        
         await login({ username, password });
         navigation.navigate('Home');
       }

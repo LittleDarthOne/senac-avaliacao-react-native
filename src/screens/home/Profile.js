@@ -79,6 +79,11 @@ class ProfileScreen extends Component {
     const { loading, profile, residences } = this.state;
     const { navigation }                   = this.props;
 
+    const selectedResidence = profile.residence && residences.find(residence => residence.id == profile.residence.id);
+
+    console.log('PROFILE:', profile);
+    console.log('SELECTED RESIDENCE:', selectedResidence);
+
     return (
       <ScreenContainer loading={loading} style={styles.container}>
         <View style={styles.profilePictureContainer}>
@@ -114,11 +119,11 @@ class ProfileScreen extends Component {
         />
         
         <InputPicker 
-          style={styles.input}
-          label="Residência"
+          style={styles.input} 
+          label="Residência" 
           leftIcon="home" 
           placeholder="Selecione a sua residência" 
-          value={profile.residence}
+          value={selectedResidence}
           data={residences}
           itemLabelExtractor={residence => `${residence.residenceGroup.name} ${residence.name}`}
           onChange={(residence) => this.setState(state => {

@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: Colors.BLACK,
-    opacity: 0.5
+    opacity: 0.75
   },
 
   contentContainer: {
