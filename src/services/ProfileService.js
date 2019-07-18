@@ -1,4 +1,5 @@
-import EventEmitter from 'EventEmitter';
+import EventEmitter     from 'EventEmitter';
+import { AsyncStorage } from 'react-native';
 
 import HTTPService            from './HTTPService';
 import { addLogoutListener }  from './AuthenticationService';
@@ -6,18 +7,23 @@ import { addLogoutListener }  from './AuthenticationService';
 const ENDPOINT       = '/profiles';
 const __eventEmitter = new EventEmitter();
 let   __profile;
+let   __profilePicture;
 
-const __setProfile   = (profile) => {
-    if (profile && !profile.phones)
-      profile.phones = [];
-    if (profile && !profile.phones.length)
-      profile.phones.push({});
+const __setProfile   = (profile, profilePicture) => {
+  if (profile && !profile.phones)
+    profile.phones = [];
+  if (profile && !profile.phones.length)
+    profile.phones.push({});
 
-  __profile = profile;
-  __eventEmitter.emit('save', __profile);
+  __profile        = profile;
+  __profilePicture = profilePicture;
+  __eventEmitter.emit('save', {
+    profile:        __profile, 
+    profilePicture: __profilePicture
+  });
 };
 
-addLogoutListener(() => __setProfile(undefined));
+addLogoutListener(() => __setProfile(undefined, undefined));
 
 export const createProfile = async (data) => {
   try {
@@ -31,7 +37,6 @@ export const createProfile = async (data) => {
   } catch(error) {
     const { data } = error.response;
     console.log('ERROR:', data);
-
 
     if (data.message.includes('already registered'))
       throw 'Já existe um cadastro com este CPF';
@@ -47,8 +52,9 @@ export const getProfile = async () => {
     return __profile;
 
   try {
-    const response = await HTTPService.get(ENDPOINT + '/my-profile');
-    __setProfile(response.data);
+    const response       = await HTTPService.get(ENDPOINT + '/my-profile');
+    const profilePicture = await AsyncStorage.getItem(`profilePicture${response.data.id}`);
+    __setProfile(response.data, profilePicture);
 
     return __profile;
   } catch(error) {
@@ -59,14 +65,15 @@ export const getProfile = async () => {
   }
 };
 
-export const saveProfile = async (data) => {
+export const saveProfile = async (data, picture) => {
   try {
     const profile = {...data};
     if (profile.phones)
       profile.phones = profile.phones.filter(phone => !!phone.number);
 
     const response = await HTTPService.put(ENDPOINT + '/my-profile', profile);
-    __setProfile(response.data);
+    await AsyncStorage.setItem(`profilePicture${response.data.id}`, picture);
+    __setProfile(response.data, picture);
 
     return __profile;
   } catch(error) {
@@ -82,6 +89,10 @@ export const saveProfile = async (data) => {
     else
       throw 'Ocorreu um problema inesperado';
   }
+};
+
+export const getProfilePicture = () => {
+  return __profilePicture;
 };
 
 export const addProfileSaveListener = (listener) => {

@@ -23,8 +23,8 @@ export default class AuthenticationForm extends Component {
 
     this.state = {
       mode,
-      username:       undefined,
-      password:       undefined,
+      username:       '64145647025',
+      password:       '123456',
       error:          undefined,
       loadingMessage: undefined,
       loading:        false,

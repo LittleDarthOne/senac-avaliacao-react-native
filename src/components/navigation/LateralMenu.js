@@ -7,8 +7,8 @@ import { PrimaryButton }   from 'components/action/Button';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import { getProfile, addProfileSaveListener } from 'services/ProfileService';
-import { logout }                             from 'services/AuthenticationService';
+import { getProfile, getProfilePicture, addProfileSaveListener } from 'services/ProfileService';
+import { logout }                                                from 'services/AuthenticationService';
 
 import Colors from 'utils/Colors';
 
@@ -64,9 +64,16 @@ export default class LateralMenu extends Component {
 
   loadProfile = async () => {
     try {
-      const profile = await getProfile();
-      this.setState({ profile });
-      this.profileListener = addProfileSaveListener(profile => this.setState({ profile: profile || {} }));
+      const profile        = await getProfile();
+      const profilePicture = getProfilePicture();
+      this.setState({ profile, profilePicture });
+
+      this.profileListener = addProfileSaveListener(({ profile, profilePicture }) => {
+        this.setState({ 
+          profile: profile || {},
+          profilePicture, 
+        });
+      });
     } catch (error) {
       console.log(error);
     }
@@ -86,15 +93,16 @@ export default class LateralMenu extends Component {
   };
 
   render() {
-    const { profile }    = this.state;
-    const { navigation } = this.props;
-    const currentRoute   = navigation.state.routes[navigation.state.index];
+    const { profile, profilePicture } = this.state;
+    const { navigation }              = this.props;
+
+    const currentRoute = navigation.state.routes[navigation.state.index];
 
     return (
       <ScreenContainer>
         <View style={styles.itemsContainer}>
-          <TouchableOpacity  style={styles.profileContainer} onPress={() => navigate(navigation, 'Profile')}>
-            <ProfilePicture style={styles.profileIcon} size={60} />
+          <TouchableOpacity  style={styles.profileContainer} onPress={() => navigate(navigation, 'ProfileForm')}>
+            <ProfilePicture uri={profilePicture} size={60} style={styles.profileIcon} />
             <View style={styles.profileDataContainer}>
               <Text style={styles.profileName}>{profile.name}</Text>
               <Text style={styles.profileData}>Morador</Text>

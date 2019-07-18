@@ -11,21 +11,22 @@ import InputPicker                            from 'components/inputs/InputPicke
 import { PrimaryButton, SecondaryIconButton } from 'components/action/Button';
 import { PrimaryLink }                        from 'components/action/Link';
 
-import { getResidences }           from 'services/ResidencesService';
-import { getProfile, saveProfile } from 'services/ProfileService';
+import { getResidences }                              from 'services/ResidencesService';
+import { getProfile, getProfilePicture, saveProfile } from 'services/ProfileService';
 
 import Colors from 'utils/Colors';
 
-class ProfileScreen extends Component {
+class ProfileForm extends Component {
   static navigationOptions = {
     title: 'Meus dados', 
     headerLeft: <DrawerButton />
   };
 
   state = { 
-    profile:    { phones: [{}] },
-    residences: [],
-    loading:    true,
+    profile:        { phones: [{}] },
+    profilePicture: undefined,
+    residences:     [],
+    loading:        true,
   };
 
   componentDidMount() {
@@ -33,12 +34,14 @@ class ProfileScreen extends Component {
   };
 
   loadData = async () => {
-    const profile    = await getProfile();
-    const residences = await getResidences();
+    const profile        = await getProfile();
+    const profilePicture = getProfilePicture();
+    const residences     = await getResidences();
 
     this.setState({
       loading: false,
       profile: {...profile},
+      profilePicture,
       residences,
     });
   };
@@ -60,35 +63,37 @@ class ProfileScreen extends Component {
   };
 
   save = async () => {
-    const { profile } = this.state;
+    const { profile, profilePicture } = this.state;
 
     this.setState({ loading: true, });
 
     try {
-      const savedProfile = await saveProfile(profile);
+      const savedProfile = await saveProfile(profile, profilePicture);
       this.setState({ profile: {...savedProfile} });
-      Alert.alert(undefined, 'Perfil salvo com sucesso!', [{text: 'OK' }]);
+      Alert.alert(undefined, 'Perfil salvo com sucesso!', [{ text: 'OK' }]);
     } catch(error) {
-      Alert.alert(undefined, error, [{text: 'OK' }]);
+      Alert.alert(undefined, error, [{ text: 'OK' }]);
     } finally {
       this.setState({ loading: false });
     }
   };
 
   render() {
-    const { loading, profile, residences } = this.state;
-    const { navigation }                   = this.props;
+    const { loading, profile, profilePicture, residences } = this.state;
+    const { navigation }                                   = this.props;
 
     const selectedResidence = profile.residence && residences.find(residence => residence.id == profile.residence.id);
 
-    console.log('PROFILE:', profile);
-    console.log('SELECTED RESIDENCE:', selectedResidence);
-
     return (
       <ScreenContainer loading={loading} style={styles.container}>
-        <View style={styles.profilePictureContainer}>
-          <ProfilePicture />
-        </View>
+        <ProfilePicture 
+          uri={profilePicture} 
+          onSelect={(uri) => {
+            console.log('PICTURE URI: ', uri.substr(0, 40));
+            this.setState({ profilePicture: uri })
+          }} 
+          style={styles.profilePicture} 
+        />
 
         <InputText 
           style={styles.input}
@@ -180,11 +185,8 @@ const styles = StyleSheet.create({
     padding: 24,
   },
 
-  profilePictureContainer: {
+  profilePicture: {
     alignSelf: 'stretch',
-    padding: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
     paddingBottom: 24,
   },
 
@@ -209,4 +211,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default createCustomStackNavigator({ ProfileScreen });
+export default createCustomStackNavigator({ ProfileForm });

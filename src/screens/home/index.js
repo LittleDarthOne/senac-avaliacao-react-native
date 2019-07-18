@@ -5,13 +5,13 @@ import { createCustomDrawerNavigator, createCustomStackNavigator } from 'compone
 import VisitsList   from './VisitsList';
 import VisitorsList from './VisitorsList';
 import VisitorForm  from './VisitorForm';
-import Profile      from './Profile';
+import ProfileForm  from './ProfileForm';
 import Config       from './Config';
 
 const drawerRoutes = {
   VisitsList,
   VisitorsList,
-  Profile,
+  ProfileForm,
   Config,
 };
 

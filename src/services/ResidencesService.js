@@ -21,13 +21,12 @@ export const getResidences = async () => {
       const residences = await __requestResidences(residenceGroup);
       for (const residenceIndex in residences) {
         let residence = residences[residenceIndex];
-        
+
         residence.residenceGroup = residenceGroup;
         result.push(residence);
       }
     }
 
-    console.log(result.length, 'RESIDENCES LOADED:', result);
     return result;
   } catch(error) {
     const { data } = error.response;
