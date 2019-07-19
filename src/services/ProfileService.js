@@ -17,6 +17,7 @@ const __setProfile   = (profile, profilePicture) => {
 
   __profile        = profile;
   __profilePicture = profilePicture;
+
   __eventEmitter.emit('save', {
     profile:        __profile, 
     profilePicture: __profilePicture
@@ -72,7 +73,10 @@ export const saveProfile = async (data, picture) => {
       profile.phones = profile.phones.filter(phone => !!phone.number);
 
     const response = await HTTPService.put(ENDPOINT + '/my-profile', profile);
-    await AsyncStorage.setItem(`profilePicture${response.data.id}`, picture);
+
+    if (picture)
+      await AsyncStorage.setItem(`profilePicture${response.data.id}`, picture);
+
     __setProfile(response.data, picture);
 
     return __profile;

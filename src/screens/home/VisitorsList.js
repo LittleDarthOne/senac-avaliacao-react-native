@@ -1,14 +1,15 @@
-import React, { Component }                                   from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { Component }                                          from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import { createCustomStackNavigator }                     from 'components/navigation/Navigator';
-import { DrawerButton }                                   from 'components/navigation/Header';
-import ScreenContainer                                    from 'components/ScreenContainer';
-import { PrimaryFloatingButton, SecondaryFloatingButton } from 'components/action/Button';
+import { createCustomStackNavigator } from 'components/navigation/Navigator';
+import { DrawerButton }               from 'components/navigation/Header';
+import ScreenContainer                from 'components/ScreenContainer';
+import { PrimaryFloatingButton }      from 'components/action/Button';
 
 import { getVisitors } from 'services/VisitorsService';
+import { getProfile }  from 'services/ProfileService';
 
 import Dates  from 'utils/Dates';
 import Colors from 'utils/Colors';
@@ -23,9 +24,10 @@ class VisitorsList extends Component {
     super(props);
 
     this.state = { 
-      loading:    true,
-      visitors:   [],
-      refreshing: false,
+      loading:      true,
+      visitors:     [],
+      refreshing:   false,
+      emptyMessage: undefined,
     };
   };
 
@@ -39,37 +41,40 @@ class VisitorsList extends Component {
   };
 
   loadData = async (load) => {
-    const now = new Date();
-    const loadedData = await getVisitors();
-    this.setState({
-      loading:    false,
-      refreshing: false,
-      visitors:   loadedData,
-    });
+    try {
+      const profile = await getProfile();
+      const loadedData = await getVisitors();
+      this.setState({
+        loading:    false,
+        refreshing: false,
+        visitors:   loadedData,
+        emptyMessage: 'Nenhum visitante autorizado',
+      });
+    } catch (error) {
+      Alert.alert(undefined, error, [{ text: 'OK' }]);
+    } finally {
+      this.setState({ 
+        loading:    false, 
+        refreshing: false 
+      });
+    }
+  };
+
+  handleFormAction = (visitor) => {
+    const { visitors } = this.state;
+    const newVisitors = visitors.filter(currentVisitor => currentVisitor.id != visitor.id);
+
+    if (!visitor.__deleted)
+      newVisitors.push(visitor);
+
+    this.setState({ visitors: newVisitors });
   };
 
   navigateToForm = (visitor) => {
-    this.props.navigation.navigate('VisitorForm', { visitor });
-  };
-
-  render() {
-    const { loading, visitors, refreshing } = this.state;
-    const { navigation }                    = this.props;
-
-    return (
-      <ScreenContainer loading={loading} scrollable={false} style={styles.container}>
-        <FlatList
-          data={visitors.sort((visitor1, visitor2) => visitor1.name.localeCompare(visitor2.name))}
-          keyExtractor={visitor => 'visitor-' + visitor.id}
-          renderItem={this.renderVisitor}
-          onRefresh={this.refresh}
-          refreshing={refreshing}
-          ListEmptyComponent={this.renderEmpty}
-        />
-        
-        <PrimaryFloatingButton icon="plus" onPress={() => this.navigateToForm()} />
-      </ScreenContainer> 
-    );
+    this.props.navigation.navigate('VisitorForm', { 
+      visitor, 
+      onAction: this.handleFormAction,
+    });
   };
 
   renderEmpty = () => {
@@ -82,7 +87,7 @@ class VisitorsList extends Component {
     );
   };
 
-  renderVisitor = ({item}) => {
+  renderVisitor = ({ item }) => {
     const { navigation } = this.props;
     const creationDate   = item.creationDate && new Date(item.creationDate);
     const dateTimeString = Dates.getDateString(creationDate) + ' ' + Dates.getTimeString(creationDate);
@@ -97,7 +102,33 @@ class VisitorsList extends Component {
         <FontAwesomeIcon icon="chevron-right" color={styles.visitorText.color} size={styles.visitorText.fontSize} />
       </TouchableOpacity>
     );
-  }
+  };
+
+  render() {
+    const { loading, visitors, refreshing } = this.state;
+    const { navigation }                    = this.props;
+
+    return (
+      <ScreenContainer loading={loading} scrollable={false} style={styles.container}>
+        <FlatList
+          data={visitors.sort((visitor1, visitor2) => visitor1.name.localeCompare(visitor2.name))}
+          keyExtractor={visitor => 'visitor-' + visitor.id}
+          renderItem={this.renderVisitor}
+          onRefresh={this.refresh}
+          refreshing={refreshing}
+          ListHeaderComponent={
+            <Text style={styles.headerText}>
+              Os visitantes listados aqui tem autorização prévia para lhe fazer uma visita em sua residência!
+            </Text>
+          }
+          ListFooterComponent={<View style={styles.footerContainer} />}
+          ListEmptyComponent={this.renderEmpty}
+        />
+        
+        <PrimaryFloatingButton icon="plus" onPress={() => this.navigateToForm()} />
+      </ScreenContainer> 
+    );
+  };
 };
 
 const styles = StyleSheet.create({
@@ -109,6 +140,17 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingVertical: 20,
+  },
+
+  footerContainer: {
+    height: 50,
+  },
+
+  headerText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: Colors.DEFAULT_TEXT,
+    marginBottom: 26,
   },
 
   emptyText: {
@@ -142,7 +184,6 @@ const styles = StyleSheet.create({
   authorText: {
     fontSize: 12,
     color: Colors.LIGHT_TEXT,
-    marginLeft: 4
   },
 
   visitDate: {

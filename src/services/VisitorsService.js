@@ -1,60 +1,55 @@
-import { AsyncStorage } from 'react-native';
+import HTTPService    from './HTTPService';
 
-import { getProfile }   from './ProfileService';
+const ENDPOINT = '/visitors/my-visitors';
 
-import Dates  from 'utils/Dates';
+const __persistVisitor = async (visitor) => {
+  const operation = visitor.id ? HTTPService.put : HTTPService.post;
+  const url       = ENDPOINT + (visitor.id ? ('/' + visitor.id) : '');
 
-AsyncStorage.removeItem('visitors');
-
-const visitorsList = [
-  {
-    id: '1',
-    creationDate: Dates.getDayBefore(new Date(), 2),
-    name: 'Visitante A',
-    observation: 'Observações do visitante A',
-  },
-  {
-    id: '2',
-    creationDate: Dates.getDayBefore(new Date(), 1),
-    name: 'Visitante B',
-    observation: 'Observações do visitante B',
-  },
-  {
-    id: '3',
-    creationDate: new Date(),
-    name: 'Visitante C',
-    observation: 'Observações do visitante C',
-  },
-];
-
-const getStorageList = async () => {
-  const stringfied = await AsyncStorage.getItem('visitors');
-  return stringfied && stringfied.length ? JSON.parse(stringfied) : [];
-}
-
-const setStorageList = async (visitors) => {
-  await AsyncStorage.setItem('visitors', JSON.stringify(visitors));
+  console.log(url);
+  return await operation(url, visitor);
 };
 
 export const getVisitors = async () => {
-  let visitors = await getStorageList();
+  try {
+    const response = await HTTPService.get(ENDPOINT);
+    return (response && response.data) || [];
+  } catch(error) {
+    const { data } = error.response;
+    console.log('GET VISITORS ERROR:', data);
 
-  if (!visitors.length) {
-    visitors = visitorsList;
-    setStorageList(visitors);
+    if (data.message.includes('inform your residence'))
+      throw 'Para começar a listar seus visitantes, informe sua residência no seu perfil';
+    else
+      throw 'Ocorreu um problema inesperado';
   }
-  return visitors;
 };
 
-export const addVisitor = async (visitor) => {
-  let visitors = await getVisitors();
+export const saveVisitor = async (data) => {
+  try {
+    const visitor   = {...data};
+    const response  = await __persistVisitor(visitor);
+    return response.data;
+  } catch(error) {
+    const { data } = error.response;
+    console.log('SAVE VISITOR ERROR:', data);
 
-  visitor.creationDate  = new Date();
-  visitor.authorizeDate = visitor.creationDate;
-  visitor.author        = getProfile();
-  visitor.residence     = visitor.author.residence;
-  visitor.id = visitors.length + 1;
+    if (data.message.includes('must be informed'))
+      throw 'O nome nome do visitante é obrigatório e não pode ficar em branco';
+    else if (data.message.includes('inform your residence'))
+      throw 'Para começar a registrar seus visitantes, informe sua residência no seu perfil';
+    else
+      throw 'Ocorreu um problema inesperado';
+  }
+};
 
-  visitors.push(visitor);
-  await setStorageList(visitors);
+export const deleteVisitor = async (data) => {
+  try {
+    const response = await HTTPService.delete(ENDPOINT + '/' + data.id);
+  } catch(error) {
+    const { data } = error.response;
+    console.log('DELETE VISITOR ERROR:', data);
+
+    throw 'Ocorreu um problema inesperado';
+  }
 };

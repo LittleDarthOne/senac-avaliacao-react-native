@@ -1,12 +1,13 @@
-import React, { Component }       from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { Component }              from 'react';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 
 import { createCustomStackNavigator } from 'components/navigation/Navigator';
 import ScreenContainer                from 'components/ScreenContainer';
 import InputText                      from 'components/inputs/InputText';
 import { PrimaryButton }              from 'components/action/Button';
+import { PrimaryLink }                from 'components/action/Link';
 
-import { addVisitor }    from 'services/VisitorsService';
+import { saveVisitor, deleteVisitor } from 'services/VisitorsService';
 
 import Colors from 'utils/Colors';
 
@@ -20,11 +21,13 @@ export default class ConfigScreen extends Component {
   constructor(props) {
     super(props);
 
-    const visitor = props.navigation.getParam('visitor') || {};
+    const visitor  = props.navigation.getParam('visitor') || {};
+    const onAction = props.navigation.getParam('onAction');
 
     this.state = { 
       loading: false,
       visitor: {...visitor},
+      onAction,
     };
   };
 
@@ -35,15 +38,56 @@ export default class ConfigScreen extends Component {
   };
 
   save = async () => {
-    const { visitor } = this.state;
+    const { visitor, onAction } = this.state;
+    const { navigation }        = this.props;
 
-    this.setState({
-      loading: true,
-    });
+    this.setState({ loading: true });
 
-    await addVisitor(visitor);
+    try {
+      const savedVisitor = await saveVisitor(visitor);
+      this.setState({ loading: false }, () => {
+        Alert.alert(undefined, 'Visitante salvo com sucesso!', [{ 
+          text: 'OK', 
+          onPress: () => {
+            if (onAction)
+              onAction(savedVisitor);
 
-    this.props.navigation.goBack();
+            navigation.goBack();
+          }
+        }]);
+      });
+    } catch(error) {
+      this.setState({ loading: false }, () => {
+        Alert.alert(undefined, error, [{ text: 'OK' }]);
+      });
+    }
+  };
+
+  delete = async () => {
+    const { visitor, onAction } = this.state;
+    const { navigation }        = this.props;
+
+    this.setState({ loading: true });
+
+    try {
+      await deleteVisitor(visitor);
+      visitor.__deleted = true;
+      this.setState({ loading: false }, () => {
+        Alert.alert(undefined, 'Visitante excluído com sucesso!', [{ 
+          text: 'OK', 
+          onPress: () => {
+            if (onAction)
+              onAction(visitor);
+
+            navigation.goBack();
+          }
+        }]);
+      });
+    } catch(error) {
+      this.setState({ loading: false }, () => {
+        Alert.alert(undefined, error, [{ text: 'OK' }]);
+      });
+    }
   };
 
   render() {
@@ -54,7 +98,7 @@ export default class ConfigScreen extends Component {
         <InputText 
           style={styles.input}
           textContentType="name" 
-          label={"Nome " + visitor.id}
+          label="Nome"
           leftIcon="user"
           placeholder="Informe o nome do visitante" 
           value={visitor.name}
@@ -90,6 +134,17 @@ export default class ConfigScreen extends Component {
         />
 
         <PrimaryButton title="Salvar" onPress={this.save} />
+        <PrimaryLink 
+          style={styles.link} 
+          text="Excluir" 
+          onPress={() => {
+            Alert.alert("Atenção!", "Tem certeza de que deseja excluir este visitante?", [
+              {text: 'Não'},
+              {text: 'Sim, excluir', onPress: this.delete},
+            ])
+          }} 
+        />
+
       </ScreenContainer>
     );
   };
@@ -102,6 +157,10 @@ const styles = StyleSheet.create({
 
   input: {
     marginBottom: 24,
+  },
+
+  link: {
+    margin: 16,
   },
 
 });

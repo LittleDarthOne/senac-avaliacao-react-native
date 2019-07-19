@@ -1,15 +1,26 @@
-import React, { Component }                         from 'react';
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import React, { Component }                                    from 'react';
+import { StyleSheet, TouchableOpacity, Vibration, View, Text } from 'react-native';
 
 import Colors from 'utils/Colors';
+
+const vibrateOnPress = (onPress) => {
+  Vibration.vibrate(50);
+
+  if (onPress)
+    onPress();
+};
 
 class BasicLink extends Component {
 
   render() {
-    const { text, style, containerStyle, ...otherProps } = this.props;
+    const { text, style, containerStyle, onPress, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.basicLinkContainer, containerStyle]} {...otherProps}>
+      <TouchableOpacity 
+        style={[styles.basicLinkContainer, containerStyle]} 
+        onPress={() => vibrateOnPress(onPress)} 
+        {...otherProps}
+      >
         <Text style={[styles.linkText, style]}>{text}</Text>
       </TouchableOpacity> 
     );

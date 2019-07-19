@@ -1,16 +1,27 @@
-import React, { Component }                         from 'react';
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import React, { Component }                                    from 'react';
+import { StyleSheet, TouchableOpacity, Vibration, View, Text } from 'react-native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import Colors from 'utils/Colors';
 
+const vibrateOnPress = (onPress) => {
+  Vibration.vibrate(50);
+
+  if (onPress)
+    onPress();
+};
+
 class RoundedButton extends Component {
   render() {
-    const { title, style, titleStyle, ...otherProps } = this.props;
+    const { title, style, titleStyle, onPress, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.roundedButtonContainer, otherProps.disabled && styles.disabled, style]} {...otherProps}>
+      <TouchableOpacity 
+        style={[styles.roundedButtonContainer, otherProps.disabled && styles.disabled, style]} 
+        onPress={() => vibrateOnPress(onPress)}
+        {...otherProps}
+      >
         <Text style={[styles.roundedButtonTitle, titleStyle]}>{title}</Text>
       </TouchableOpacity> 
     );
@@ -19,10 +30,14 @@ class RoundedButton extends Component {
 
 class IconButton extends Component {
   render() {
-    const { icon, iconColor, iconStyle, style, ...otherProps } = this.props;
+    const { icon, iconColor, iconStyle, style, onPress, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.iconButtonContainer, otherProps.disabled && styles.disabled, style]} {...otherProps}>
+      <TouchableOpacity 
+        style={[styles.iconButtonContainer, otherProps.disabled && styles.disabled, style]} 
+        onPress={() => vibrateOnPress(onPress)}
+        {...otherProps}
+      >
         <FontAwesomeIcon size={20} icon={icon} color={iconColor} style={iconStyle} />
       </TouchableOpacity> 
     );
@@ -38,10 +53,14 @@ class FloatingButton extends Component {
   };
 
   render() {
-    const { icon, iconColor, iconStyle, position, style, ...otherProps } = this.props;
+    const { icon, iconColor, iconStyle, position, style, onPress, ...otherProps } = this.props;
 
     return (
-      <TouchableOpacity style={[styles.floationgButtonContainer, position, otherProps.disabled && styles.disabled, style]} {...otherProps}>
+      <TouchableOpacity 
+        style={[styles.floationgButtonContainer, position, otherProps.disabled && styles.disabled, style]} 
+        onPress={() => vibrateOnPress(onPress)}
+        {...otherProps}
+      >
         <FontAwesomeIcon size={20} icon={icon} color={iconColor} style={iconStyle} />
       </TouchableOpacity> 
     );
